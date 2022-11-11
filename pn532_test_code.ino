@@ -29,6 +29,7 @@ void loop()
 {
   if(nfcRead == 0)
     readNFC();
+  
 }
  //UID 04 7C 35 EA B4 55 80
  //UID 04 31 93 EA CE 76 80
@@ -43,18 +44,26 @@ void readNFC()
    tag.print();
    
    tagId = tag.getUidString();
-   if(tagId == "04 54 23 32 8D 6F 80"){
+   if(tagId.substring(0,3) == "04 "){
      Serial.println("Match");
+
+     for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+      // in steps of 1 degree
+      myservo.write(pos);              // tell servo to go to position in variable 'pos'
+      delay(15);                       // waits 15ms for the servo to reach the position
+      }
+
+      delay(5000);
+      myservo.write(0);
+      
    }
    else{
      Serial.println("No Match");
    }
-   for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
-      // in steps of 1 degree
-      myservo.write(pos);              // tell servo to go to position in variable 'pos'
-      delay(15);                       // waits 15ms for the servo to reach the position
-    }
+   nfcRead = 0;
+   
  }
+
+
  
- delay(5000);
 }
