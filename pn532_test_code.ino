@@ -3,6 +3,7 @@
 #include <PN532.h>
 #include <NfcAdapter.h>
 #include <Servo.h>
+#define LED 13
 
 PN532_I2C pn532_i2c(Wire);
 NfcAdapter nfc = NfcAdapter(pn532_i2c);
@@ -23,6 +24,7 @@ void setup(void)
  nfc.begin();
    myservo.attach(9);  // attaches the servo on pin 9 to the servo object
   myservo.write(0);
+ pinmode(LED, OUTPUT);
 }
  
 void loop() 
@@ -46,14 +48,16 @@ void readNFC()
    tagId = tag.getUidString();
    if(tagId.substring(0,3) == "04 "){
      Serial.println("Match");
+     digitalWrite(LED, HIGH);
 
      for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
       // in steps of 1 degree
       myservo.write(pos);              // tell servo to go to position in variable 'pos'
       delay(15);                       // waits 15ms for the servo to reach the position
       }
-
+      
       delay(5000);
+      digitalWrite(LED, LOW);
       myservo.write(0);
       
    }
