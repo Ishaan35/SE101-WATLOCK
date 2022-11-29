@@ -137,6 +137,12 @@ app.post("/return_bike", async (req, res) =>{
   }
 })
 
+app.post('/login', async(req, res) =>{
+  res.json({
+    message:"success"
+  })
+})
+
 
 app.post("/test", async(req, res) =>{
   console.log(req.body);
