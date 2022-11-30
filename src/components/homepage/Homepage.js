@@ -11,7 +11,7 @@ export default function Homepage() {
 
     let navigate = useNavigate();
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
 
     useEffect(() => {
@@ -64,9 +64,10 @@ export default function Homepage() {
     {/*This header is blank. just has h2 text*/}
      <div className="Header">
         <h2>WatLock Admin Page</h2>
+        <button id="button1" onClick={logout}>Logout</button>
      </div>
-      <button onClick={logout}>Logout</button>
-      <button onClick={getLocks}>Refresh Data</button>
+      
+      <button className="refreshButton" onClick={getLocks}>Refresh Data</button>
 
       <hr></hr>
 

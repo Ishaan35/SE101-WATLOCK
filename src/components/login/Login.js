@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLogin } from "../LoginContext/LoginContext";
 import { useNavigate } from "react-router-dom";
+import "./Login.css";
 
 export default function Login() {
     const { email, setEmail, password, setPassword, login, loggedIn } = useLogin();
@@ -22,11 +23,13 @@ export default function Login() {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <input type="text" value={email} onChange={updateEmail}></input>
-      <input type="password" value={password} onChange={updatePassword}></input>
-      <button onClick={login}>Login</button>
+    <div className="login">
+      <h1>Watlock Login</h1>
+      <input className="input1" type="text" placeholder="Email" value={email} onChange={updateEmail}></input>
+      <input className="input2" type="password" placeholder="Password" value={password} onChange={updatePassword}></input>
+      <div>
+        <button onClick={login}>Login</button>
+      </div>
     </div>
   );
 }
