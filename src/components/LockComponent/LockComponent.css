@@ -1,0 +1,10 @@
+.LockComponentCard{
+    background-color: rgb(244, 244, 244);
+    margin: 10px;
+    display: flex;
+    align-items:flex-start;
+    flex-direction: column;
+    padding: 10px;
+    padding-left: 30px;
+    width: 100%;
+}

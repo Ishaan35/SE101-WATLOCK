@@ -1,0 +1,13 @@
+.loadingDiv{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+}
+
+
+.loadingIcon{
+    height: 50px;
+    margin-left: 20px;
+}
