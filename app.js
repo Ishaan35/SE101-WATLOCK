@@ -25,34 +25,37 @@ app.post("/rent_bike", async (req, res) => {
   }
   if (mongo_client) {
     try {
+      console.log("Renting Bike:", req.body);
       let lock_id = req.body.lock_id;
       let user_id = req.body.user_id;
 
       //query parameters. Which lock are we trying to check if there is a bike available? And what information do we set if it is available?
       let query = { lock_id: lock_id };
-      
- 
+
       //the database has two collections we are interested. the database with the statuses of all the locks (in our demo we have only one), and the list of all the registered students allowed to check out a bike
       const db = mongo_client.db("Bike-Lock-Database");
       const collection_locks = db.collection("locks_status");
       const collection_users = db.collection("users_info");
 
-
       //first we check if a valid waterloo student is trying to check out a bike. if not, res.send an error and the arduino will not unlock
       let user_lookup = await collection_users.findOne({ uid: user_id }); //first we make a request to see if this is a valid user. if not, immediately stop
       //if valid user found with the given id
-      if(user_lookup && user_lookup.uid == user_id && user_lookup.first_name && user_lookup.last_name){
-
+      if (
+        user_lookup &&
+        user_lookup.uid == user_id &&
+        user_lookup.first_name &&
+        user_lookup.last_name
+      ) {
         let new_values = {
           $set: {
             available: false,
             date_rented: Date.now(),
             user_id_using: user_id,
             user_first_name: user_lookup.first_name,
-            user_last_name: user_lookup.last_name
+            user_last_name: user_lookup.last_name,
           },
         };
-        
+
         //We can find the lock with the given lock_id. if it is available, then we can update its info so the bike is rented by this user
         let lockStatus = await collection_locks.findOne(query);
         if (
@@ -65,11 +68,9 @@ app.post("/rent_bike", async (req, res) => {
         } else {
           res.json({ error: "Bike already in use" });
         }
+      } else {
+        res.json({ error: "Not a Waterloo Student" });
       }
-      else{
-        res.json({error:"Not a Waterloo Student"});
-      }
-      
     } catch (e) {
       res.json({
         error: e.message,
@@ -81,13 +82,14 @@ app.post("/rent_bike", async (req, res) => {
     });
   }
 });
-app.post("/return_bike", async (req, res) =>{
+app.post("/return_bike", async (req, res) => {
   if (!mongo_client) {
     await mongo_client.connect();
     console.log("Re-Connecting............");
   }
   if (mongo_client) {
     try {
+      console.log("Returning Bike:", req.body);
       let lock_id = req.body.lock_id;
       let user_id = req.body.user_id;
 
@@ -128,9 +130,9 @@ app.post("/return_bike", async (req, res) =>{
       error: "server error",
     });
   }
-})
+});
 
-app.post('/login', async(req, res) =>{
+app.post("/login", async (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
 
@@ -140,8 +142,7 @@ app.post('/login', async(req, res) =>{
   }
   if (mongo_client) {
     try {
-
-      let query = { email: email, password:password };
+      let query = { email: email, password: password };
 
       console.log(query);
 
@@ -161,41 +162,36 @@ app.post('/login', async(req, res) =>{
       error: "server error",
     });
   }
+});
 
-})
-
-
-async function getLockInfo(){
+async function getLockInfo() {
   if (!mongo_client) {
     await mongo_client.connect();
     console.log("Re-Connecting............");
   }
   if (mongo_client) {
     try {
-
       const db = mongo_client.db("Bike-Lock-Database");
       const collection_locks = db.collection("locks_status");
 
       let result = await collection_locks.findOne({
         lock_id: "rehfh83fh3189rbdfgc3y6tr4ytvhxfbrtuy",
       });
-      
+
       console.log(result);
       return result;
-      
     } catch (e) {
       return {
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }
 
-
-app.post("/test", async(req, res) =>{
+app.post("/test", async (req, res) => {
   console.log(req.body);
   res.json(req.body);
-})
+});
 
 //"npm start"
 const PORT = 5000;
