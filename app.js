@@ -12,22 +12,10 @@ const database_connection = `mongodb+srv://merge_conflict_admin:${process.env.bi
 let mongo_client = new MongoClient(database_connection);
 mongo_client.connect();
 
-app.get("/lock_id_availability/:id", async (req, res) => {
-  if (!mongo_client) {
-    await mongo_client.connect();
-    console.log("Re-Connecting............");
-  }
-  if (mongo_client) {
-    try {
-      res.send("hi");
-    } catch (e) {
-      res.send({
-        error: e.message,
-      });
-    }
-  } else {
-    res.send("error");
-  }
+app.get("/lock_id_availability", async (req, res) => {
+  let result = await getLockInfo();
+
+  res.json(result);
 });
 
 app.post("/rent_bike", async (req, res) => {
@@ -42,13 +30,7 @@ app.post("/rent_bike", async (req, res) => {
 
       //query parameters. Which lock are we trying to check if there is a bike available? And what information do we set if it is available?
       let query = { lock_id: lock_id };
-      let new_values = {
-        $set: {
-          available: false,
-          date_rented: Date.now(),
-          user_id_using: user_id,
-        },
-      };
+      
  
       //the database has two collections we are interested. the database with the statuses of all the locks (in our demo we have only one), and the list of all the registered students allowed to check out a bike
       const db = mongo_client.db("Bike-Lock-Database");
@@ -60,6 +42,16 @@ app.post("/rent_bike", async (req, res) => {
       let user_lookup = await collection_users.findOne({ uid: user_id }); //first we make a request to see if this is a valid user. if not, immediately stop
       //if valid user found with the given id
       if(user_lookup && user_lookup.uid == user_id && user_lookup.first_name && user_lookup.last_name){
+
+        let new_values = {
+          $set: {
+            available: false,
+            date_rented: Date.now(),
+            user_id_using: user_id,
+            user_first_name: user_lookup.first_name,
+            user_last_name: user_lookup.last_name
+          },
+        };
         
         //We can find the lock with the given lock_id. if it is available, then we can update its info so the bike is rented by this user
         let lockStatus = await collection_locks.findOne(query);
@@ -89,7 +81,6 @@ app.post("/rent_bike", async (req, res) => {
     });
   }
 });
-
 app.post("/return_bike", async (req, res) =>{
   if (!mongo_client) {
     await mongo_client.connect();
@@ -106,6 +97,8 @@ app.post("/return_bike", async (req, res) =>{
           available: true,
           date_rented: -1,
           user_id_using: "",
+          user_first_name: "",
+          user_last_name: "",
         },
       };
 
@@ -138,10 +131,65 @@ app.post("/return_bike", async (req, res) =>{
 })
 
 app.post('/login', async(req, res) =>{
-  res.json({
-    message:"success"
-  })
+  let email = req.body.email;
+  let password = req.body.password;
+
+  if (!mongo_client) {
+    await mongo_client.connect();
+    console.log("Re-Connecting............");
+  }
+  if (mongo_client) {
+    try {
+
+      let query = { email: email, password:password };
+
+      console.log(query);
+
+      const db = mongo_client.db("Bike-Lock-Database");
+      const collection = db.collection("admin_users");
+
+      let user = await collection.findOne(query);
+
+      res.json(user);
+    } catch (e) {
+      res.json({
+        error: e.message,
+      });
+    }
+  } else {
+    res.json({
+      error: "server error",
+    });
+  }
+
 })
+
+
+async function getLockInfo(){
+  if (!mongo_client) {
+    await mongo_client.connect();
+    console.log("Re-Connecting............");
+  }
+  if (mongo_client) {
+    try {
+
+      const db = mongo_client.db("Bike-Lock-Database");
+      const collection_locks = db.collection("locks_status");
+
+      let result = await collection_locks.findOne({
+        lock_id: "rehfh83fh3189rbdfgc3y6tr4ytvhxfbrtuy",
+      });
+      
+      console.log(result);
+      return result;
+      
+    } catch (e) {
+      return {
+        error: e.message
+      }
+    }
+  }
+}
 
 
 app.post("/test", async(req, res) =>{
@@ -150,5 +198,5 @@ app.post("/test", async(req, res) =>{
 })
 
 //"npm start"
-const PORT = 3000;
+const PORT = 5000;
 app.listen(process.env.PORT || PORT, () => {});
