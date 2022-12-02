@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "watlock",
-    "slug": "watlock",
+    "name": "watlocker",
+    "slug": "watlocker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
