@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, Dimensions, KeyboardAvoidingView, ScrollView, FlatList} from 'react-native';
+import { StyleSheet, Text, View, Image, Dimensions, KeyboardAvoidingView, ScrollView, FlatList, RefreshControl} from 'react-native';
 import {Appbar, useTheme, Button, TextInput, Searchbar, BottomNavigation } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -119,7 +119,11 @@ useEffect(() => {if(locks.length < 1){
  {/* <Searchbar
       placeholder="Search"
     /> */}
-    <View style = {{border: 5, borderColor: 'grey'}}>
+    <ScrollView style = {{border: 5, borderColor: 'grey'}} refreshControl={
+          <RefreshControl
+            onRefresh={getData}
+          />
+        }>
       <Text style = {{textAlign:'center', marginTop: 100, fontSize:30, fontFamily: 'Courier New'}}>Available locks near you: </Text>
       <FlatList
         data={locks}
@@ -130,7 +134,7 @@ useEffect(() => {if(locks.length < 1){
       />
 
 
-    </View>
+    </ScrollView>
     
     </View>
   );
