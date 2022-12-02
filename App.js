@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, Dimensions} from 'react-native';
+import { StyleSheet, Text, View, Image, Dimensions, KeyboardAvoidingView, ScrollView, FlatList} from 'react-native';
 import {Appbar, useTheme, Button, TextInput } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -11,18 +11,10 @@ import { Provider as PaperProvider } from 'react-native-paper';
 
 const Stack = createNativeStackNavigator();
 
-
-function Header() {
-  <Appbar.Header>
-      <Appbar.Content title="WATLOCK for students" />
-    </Appbar.Header>
-}
-
 function Form({navigation}) {
 
   const [email, setEmail] = useState('');
   const [pwd, setPwd] = useState('');
-  const [loggedIn, setLoggedIn] = useState(false);
   const [error, setError] = useState(false);
 
 async function sendData() {
@@ -39,10 +31,8 @@ async function sendData() {
     body: JSON.stringify(data),
   });
   const response_ = await response.json();
-  console.log(response_);
 
  if(response_ && response_.email){
-    setLoggedIn(true);
     setEmail(response_.email);
     setPwd(response_.password);
     navigation.navigate('Home');
@@ -51,7 +41,10 @@ setError(true);
 }
 
 
-return(<View style={{marginTop:80, flex:1, justifyContent: 'space-between'}}>
+return(<ScrollView style={{backgroundColor: '#FFF176', height : '100%'}} >
+  <Text style = {{textAlign:'center', marginTop: 100, fontSize:30, fontFamily: 'Courier New'}}>WATLOCK for students</Text>
+  <KeyboardAvoidingView behavior={'height'} style={{marginTop:80, marginBottom:80, flex:1, justifyContent: 'center', alignItems: 'center'}}>
+    
   <Image
         style={styles.image}
         source={{
@@ -59,13 +52,13 @@ return(<View style={{marginTop:80, flex:1, justifyContent: 'space-between'}}>
         }}
       />
   <TextInput style = {styles.input} error={error} mode = 'flat' label="Email" type = "email" required placeholder="someone@example.com"  value={email} onChangeText={(e)=>setEmail(e)}/>
-  <TextInput style = {styles.input} error={error} mode = 'flat' label = "Password" secureTextEntry={true} required placeholder="password" onChangeText={(e)=>
+  <TextInput style = {styles.input} error={error} mode = 'flat' label = "Password" secureTextEntry={true} required placeholder="Password" onChangeText={(e)=>
     setPwd(e) }/>
 
 <Button  mode="contained" onPress={sendData}>
 Login</Button>
-
-</View>);
+</KeyboardAvoidingView>
+</ScrollView>);
 
 
 }
@@ -73,6 +66,7 @@ Login</Button>
 function Home() {
   const [locks, setLocks] = useState([]);
   const [gotData, setgotData] = useState(false);
+  const [location, setLocation] = useState(0);
 
 
   const getData = async () =>{
@@ -93,12 +87,30 @@ function Home() {
         setgotData(true);
         setLocks([response]);
       }
-
-    //}
-    
-
-    //setLocks(response);
 }
+
+function success (position) {
+  setLocation(position.coords)
+}
+
+//all credit goes to the following link, i copied their code for the haversine formula: http://www.movable-type.co.uk/scripts/latlong.html
+function getDistance(lat1, lat2, lon1, lon2) {
+  const R = 6371e3; // metres
+  const φ1 = lat1 * Math.PI/180; // φ, λ in radians
+  const φ2 = lat2 * Math.PI/180;
+  const Δφ = (lat2-lat1) * Math.PI/180;
+  const Δλ = (lon2-lon1) * Math.PI/180;
+  
+  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  
+  const d = R * c;
+  return d;
+
+}
+
 useEffect(() => {if(locks.length < 1){
   getData();}
 });
@@ -107,9 +119,16 @@ useEffect(() => {if(locks.length < 1){
     <View style = {styles.container}>
  
     <View style = {{border: 5, borderColor: 'grey'}}>
-      <Text>Available locks near you: </Text>
-      {console.log(locks)}
-      {locks.map((lock)=>{if(lock.available) {return(<Text key={lock.lock_id}>{lock.name}</Text>)}})}
+      <Text style = {{textAlign:'center', marginTop: 100, fontSize:30, fontFamily: 'Courier New'}}>Available locks near you: </Text>
+      <FlatList
+        data={locks}
+        renderItem={(lock) => {if(locks.length>=1) {if (!lock.item.availability) {
+          navigator.geolocation.getCurrentPosition(success);
+          return (<Text>{lock.item.name}: {Math.round(getDistance(location.latitude, lock.item.lat, location.longitude, lock.item.long))}m away</Text>)
+        }}}}
+      />
+
+
     </View>
 
     </View>
@@ -119,13 +138,10 @@ useEffect(() => {if(locks.length < 1){
 
 export default function App() {
 
-  const theme = useTheme();
-
-
   return (<PaperProvider>
-    <NavigationContainer>
-    <Stack.Navigator>
-    <Stack.Screen name="Form" component={Form}/>
+    <NavigationContainer >
+    <Stack.Navigator >
+    <Stack.Screen name="Sign in" component={Form}/>
     <Stack.Screen name="Home" component={Home}/>
       </Stack.Navigator>
     </NavigationContainer>
@@ -141,7 +157,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   }, input:{
     height: 50,
-    margin: 10,
+    width: 200,
+    margin: 20,
     borderWidth:'medium',
     borderRadius: '10',
     padding: 5,
@@ -150,4 +167,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 50,
   }, 
+  card: {
+
+  }
 });
