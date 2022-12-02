@@ -50,8 +50,8 @@ return(<ScrollView style={{backgroundColor: '#FFF176', height : '100%'}} >
           uri: 'https://uwaterloo.ca/brand/sites/ca.brand/files/styles/body-500px-wide/public/uploads/images/university-of-waterloo-vertical-logo.png?itok=9KCQdLsy',
         }}
       />
-  <TextInput style = {styles.input} error={error} mode = 'flat' label="Email" type = "email" required placeholder="someone@example.com"  value={email} onChangeText={(e)=>setEmail(e)}/>
-  <TextInput style = {styles.input} error={error} mode = 'flat' label = "Password" secureTextEntry={true} required placeholder="Password" onChangeText={(e)=>
+  <TextInput style = {styles.input} error={error} mode = 'flat' label="Email" type = "email" required placeholder="someone@example.com" value = {email} onChangeText={(e)=>setEmail(e.toLowerCase())}/>
+  <TextInput style = {styles.input} error={error} mode = 'flat' label = "Password" secureTextEntry={true} required placeholder="Password" value = {pwd} onChangeText={(e)=>
     setPwd(e) }/>
 
 <Button  mode="contained" onPress={sendData}>
