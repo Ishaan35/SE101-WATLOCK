@@ -1,9 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, Dimensions, KeyboardAvoidingView, ScrollView, FlatList} from 'react-native';
-import {Appbar, useTheme, Button, TextInput } from 'react-native-paper';
+import {Appbar, useTheme, Button, TextInput, Searchbar, BottomNavigation } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
-
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider as PaperProvider } from 'react-native-paper';
 
@@ -117,23 +116,56 @@ useEffect(() => {if(locks.length < 1){
 
   return (
     <View style = {styles.container}>
- 
+ {/* <Searchbar
+      placeholder="Search"
+    /> */}
     <View style = {{border: 5, borderColor: 'grey'}}>
       <Text style = {{textAlign:'center', marginTop: 100, fontSize:30, fontFamily: 'Courier New'}}>Available locks near you: </Text>
       <FlatList
         data={locks}
         renderItem={(lock) => {if(locks.length>=1) {if (!lock.item.availability) {
-          navigator.geolocation.getCurrentPosition(success);
-          return (<Text>{lock.item.name}: {Math.round(getDistance(location.latitude, lock.item.lat, location.longitude, lock.item.long))}m away</Text>)
+          navigator.geolocation.getCurrentPosition(success, (error)=>console.log(error));
+          return (<Text style={styles.card}>{lock.item.name}: {Math.round(getDistance(location.latitude, lock.item.lat, location.longitude, lock.item.long))}m away</Text>)
         }}}}
       />
 
 
     </View>
-
+    
     </View>
   );
 
+}
+
+function About() {
+
+  return(
+    <Text style={{color: '#EEDD02', fontFamily: 'Courier New', textAlign:'center', marginTop: 'auto', marginBottom: 'auto'}}>
+      WATLOCK was made by, first and foremost, a group of students who were friends, and decided to do a project together. After long hours of hardwork, this group of friends who consider each other to be family present to you WATLOCK: A bike sharing system that allows uWaterloo students to use bicycles on campus.
+    </Text>
+
+  ) 
+}
+
+//the following function is taken from the react native paper docs
+function Bottom() {
+const [index, setIndex] = useState(0);
+    const [routes] = useState([
+    { key: 'Locks', title: 'Available locks', focusedIcon: 'bicycle', unfocusedIcon: 'bicycle'},
+    { key: 'us', title: 'About us', focusedIcon: 'mdiAccountMultiple', unfocusedIcon: 'mdiAccountMultipleOutline'}
+  ]);
+
+  const renderScene = BottomNavigation.SceneMap({
+  Locks: Home,
+  us: About,
+});
+
+
+    return(<BottomNavigation
+      navigationState={{ index, routes }}
+      onIndexChange={setIndex}
+      renderScene={renderScene}
+    />) 
 }
 
 export default function App() {
@@ -142,7 +174,7 @@ export default function App() {
     <NavigationContainer >
     <Stack.Navigator >
     <Stack.Screen name="Sign in" component={Form}/>
-    <Stack.Screen name="Home" component={Home}/>
+    <Stack.Screen name="Home" component={Bottom}/>
       </Stack.Navigator>
     </NavigationContainer>
     </PaperProvider>
@@ -166,8 +198,10 @@ const styles = StyleSheet.create({
   image: {
     width: 100,
     height: 50,
-  }, 
+  },
   card: {
-
+    borderWidth: 'medium',
+    borderRadius: 7,
+    padding: 2
   }
 });
