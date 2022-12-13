@@ -8,3 +8,8 @@ The primary hardware that was utilized was an Arduino UNO, a PN532 module, and a
 
 On the Arduino UNO board, along with the PN532 module and the ESP32 WI-FI board, we used several other components such as a 180 degree rotating servo motor, an RGB LED, a buzzer, and a 9V battery as the power source. Here is a simple schematic of the configuration: 
 
+![schematic.jpg](https://github.com/jasonmilad/se101/blob/main/schematic.jpg?raw=true)
+
+There is also a Node.js server, and a React.js front-end portal which allows admins to view information of all registered locks. The server connects to a MongoDB NoSQL database to keep track of the student, admin, and bike lock information. The ESP32 WI-FI board connects to the server through HTTP POST and GET requests through a standard WPA WI-FI connection. Here is a flow chart describing the structure of our project
+
+![schematic.jpg](https://github.com/jasonmilad/se101/blob/main/project_structure.jpg?raw=true)
