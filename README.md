@@ -1,6 +1,6 @@
 # SE101
 
-This is our final SE 101 course project in Software Engineering at the University of Waterloo. There are separate components to this project separated on different branches (server, front-end, microcontroller code)
+This is our final SE 101 course project in Software Engineering at the University of Waterloo. There are separate components to this project separated on different branches (server, front-end, microcontroller code).
 
 At the center of all purchases and verification on campus is Waterloo’s own NFC (near-field communication) compatible object called the WatCard. We thus decided to use the Watcard (campus identification card) to create a university-wide bike sharing system. 
 
